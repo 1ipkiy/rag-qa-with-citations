@@ -6,7 +6,7 @@
 
 A local **retrieval-augmented generation** demo over a small cybersecurity + AI educational corpus. Every answer returns **citations** (source file, section, similarity score, snippet) you can verify. CPU-only, free stack, real retrieval metrics from a script.
 
-Also see [SMS Spam vs Ham Classifier](https://github.com/1ipkiy/sms-spam-classifier) (Project 1).
+Also see [SMS Spam vs Ham Classifier](https://github.com/1ipkiy/sms-spam-classifier) (Project 1), [Prompt Injection Detector](https://github.com/1ipkiy/prompt-injection-detector) (Project 6), and [Multimodal Phishing Vision](https://github.com/1ipkiy/multimodal-phishing-vision) (Project 7).
 
 ---
 
