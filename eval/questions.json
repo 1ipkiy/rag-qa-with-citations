@@ -1,0 +1,74 @@
+[
+  {
+    "id": "q01",
+    "question": "What are the five core functions of the NIST Cybersecurity Framework?",
+    "expected_sources": ["nist_csf_overview.md"],
+    "notes": "Should retrieve Identify Protect Detect Respond Recover"
+  },
+  {
+    "id": "q02",
+    "question": "What is an organizational profile in NIST CSF?",
+    "expected_sources": ["nist_csf_overview.md"],
+    "notes": "Profiles and tiers section"
+  },
+  {
+    "id": "q03",
+    "question": "What are common phishing patterns like urgency and lookalike domains?",
+    "expected_sources": ["phishing_overview.md"],
+    "notes": "Social engineering patterns"
+  },
+  {
+    "id": "q04",
+    "question": "How do SPF DKIM and DMARC help defend against phishing email?",
+    "expected_sources": ["phishing_overview.md"],
+    "notes": "Email security defenses"
+  },
+  {
+    "id": "q05",
+    "question": "What is the difference between authentication and authorization in IAM?",
+    "expected_sources": ["iam_concepts.md"],
+    "notes": "AAA concepts"
+  },
+  {
+    "id": "q06",
+    "question": "What is role-based access control (RBAC) versus attribute-based access control?",
+    "expected_sources": ["iam_concepts.md"],
+    "notes": "Access models"
+  },
+  {
+    "id": "q07",
+    "question": "What is a text embedding vector and why does cosine similarity matter?",
+    "expected_sources": ["embeddings_explained.md"],
+    "notes": "Embeddings basics"
+  },
+  {
+    "id": "q08",
+    "question": "Why is sentence-transformers all-MiniLM-L6-v2 a common CPU-friendly embedding model?",
+    "expected_sources": ["embeddings_explained.md", "vector_search_basics.md"],
+    "notes": "Either doc is acceptable"
+  },
+  {
+    "id": "q09",
+    "question": "What is retrieval-augmented generation and why cite sources?",
+    "expected_sources": ["rag_explained.md"],
+    "notes": "RAG definition"
+  },
+  {
+    "id": "q10",
+    "question": "What are common RAG failure modes like bad chunking or wrong embedding model?",
+    "expected_sources": ["rag_explained.md"],
+    "notes": "Failure modes"
+  },
+  {
+    "id": "q11",
+    "question": "Why use FAISS IndexFlatIP with normalized vectors for cosine similarity?",
+    "expected_sources": ["vector_search_basics.md"],
+    "notes": "Vector search / FAISS"
+  },
+  {
+    "id": "q12",
+    "question": "How should AI apps handle secrets, untrusted prompts, and prompt injection risk?",
+    "expected_sources": ["secure_coding_basics.md"],
+    "notes": "Secure coding for AI"
+  }
+]
