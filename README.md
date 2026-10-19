@@ -1,11 +1,12 @@
 # RAG Q&A with Citations
 
 **Author:** Miles Robinson · **Year:** 2026  
+**Portfolio:** Project 2 of an AI engineering series  
 **Stack:** sentence-transformers (MiniLM) · FAISS · Gradio · optional FLAN-T5-small
 
-A local **retrieval-augmented generation** demo over a small cybersecurity + AI educational corpus. Every answer returns **citations** (source file, section, similarity score, snippet).
+A local **retrieval-augmented generation** demo over a small cybersecurity + AI educational corpus. Every answer returns **citations** (source file, section, similarity score, snippet) you can verify. CPU-only, free stack, real retrieval metrics from a script.
 
-This is **Project 2** in an AI engineering portfolio (after the [SMS spam classifier](https://github.com/1ipkiy/sms-spam-classifier)): the common interview signal for applied AI roles.
+Also see [SMS Spam vs Ham Classifier](https://github.com/1ipkiy/sms-spam-classifier) (Project 1).
 
 ---
 
@@ -18,21 +19,7 @@ LLMs alone invent facts and cannot point at your documents. RAG fixes that by:
 3. Retrieving top-k neighbors for a question
 4. Answering **from those chunks** with citations you can verify
 
-The goal is a **reproducible, CPU-only** pipeline with real retrieval metrics — not a chat wrapper around a paid API.
-
----
-
-## Architecture choice
-
-| Piece | Choice | Why |
-|-------|--------|-----|
-| Embeddings | `sentence-transformers/all-MiniLM-L6-v2` | Free, ~80MB, strong on short text, CPU-friendly (384-dim) |
-| Vector store | **FAISS** `IndexFlatIP` | No daemon, tiny deps, exact search is fine for dozens of chunks; L2-normalized vectors → cosine via inner product |
-| Generation (default) | **Extractive / template RAG** | Honest grounding: quoted passages + citation IDs; works fully offline after model download |
-| Generation (optional) | `google/flan-t5-small` | Small CPU generative rewrite; falls back to extractive if unavailable |
-| UI | Gradio | Fast local demo with visible citations |
-
-**Why not Chroma?** Chroma is great for app-style persistence, but FAISS keeps this portfolio lean and makes the index files easy to inspect (`index/faiss.index` + `index/chunks.json`).
+The goal is a **reproducible, CPU-only** pipeline with real retrieval metrics — not a chat wrapper around a paid API. This is the grounded-documents skill stack interviewers hire for in applied AI roles.
 
 ---
 
@@ -54,9 +41,26 @@ Swap or add `.md` files anytime, then re-run `python ingest.py`.
 
 ---
 
-## Results (retrieval eval)
+## Approach
 
-> Numbers from `python evaluate.py` on this machine (CPU). See `results/metrics.json`.
+| Piece | Choice | Why |
+|-------|--------|-----|
+| Embeddings | `sentence-transformers/all-MiniLM-L6-v2` | Free, ~80MB, strong on short text, CPU-friendly (384-dim) |
+| Vector store | **FAISS** `IndexFlatIP` | No daemon, tiny deps; L2-normalized vectors → cosine via inner product |
+| Generation (default) | **Extractive / template RAG** | Honest grounding: quoted passages + citation IDs; works offline after model download |
+| Generation (optional) | `google/flan-t5-small` | Small CPU generative rewrite; falls back to extractive if unavailable |
+| UI | Gradio | Fast local demo with visible citations |
+| Eval | Hit rate@k + MRR | 12 questions with expected sources in `eval/questions.json` |
+
+**Why not Chroma?** FAISS keeps this portfolio lean and makes the index files easy to inspect (`index/faiss.index` + `index/chunks.json`).
+
+Pipeline: `ingest.py` (chunk → embed → index) → `query.py` / `app.py` (retrieve → answer + cite) → `evaluate.py` (metrics).
+
+---
+
+## Results
+
+> Numbers from `python evaluate.py` on this repo (CPU). See `results/metrics.json`.
 
 | Metric | Value |
 |--------|------:|
@@ -74,8 +78,8 @@ Swap or add `.md` files anytime, then re-run `python ingest.py`.
 ```
 rag-qa/
 ├── README.md
-├── HOW_I_BUILT_IT.md      # first-person build walkthrough
-├── BREAK_IT.md            # intentional failure lab (≥8 experiments)
+├── HOW_I_BUILT_IT.md      # first-person build story
+├── BREAK_IT.md            # intentional what-ifs lab
 ├── requirements.txt
 ├── .gitignore
 ├── ingest.py              # chunk → embed → FAISS index
@@ -96,72 +100,41 @@ rag-qa/
 
 ---
 
-## How to run
-
-### 1. Setup
+## Setup & run
 
 ```bash
 cd rag-qa
 python -m venv .venv
 source .venv/bin/activate   # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
-```
 
-### 2. Ingest (build the index)
-
-```bash
+# build the vector index (downloads MiniLM ~80MB on first run)
 python ingest.py
-```
 
-First run downloads MiniLM (~80MB). Creates `index/faiss.index`, `index/chunks.json`, `index/config.json`.
-
-### 3. Evaluate retrieval
-
-```bash
+# retrieval metrics → results/metrics.json
 python evaluate.py
-```
 
-Prints hit/miss per question and writes `results/metrics.json`.
-
-### 4. CLI query
-
-```bash
+# CLI Q&A with citations
 python query.py "What is RAG?"
 python query.py "Explain IAM authentication vs authorization" --mode flan-t5-small
-```
 
-### 5. Gradio demo
-
-```bash
+# Gradio demo (default http://127.0.0.1:7861)
 python app.py
 ```
 
-Open `http://127.0.0.1:7861`. You should see the answer plus a citations panel (filename, section, score, snippet).
+`ingest.py` creates `index/faiss.index`, `index/chunks.json`, and `index/config.json` (gitignored; regenerate locally).
 
 ---
 
 ## Learn by breaking it
 
-| Doc | Purpose |
-|-----|---------|
-| [`HOW_I_BUILT_IT.md`](HOW_I_BUILT_IT.md) | First-person: chunk → embed → FAISS → retrieve → cite → eval → Gradio |
-| [`BREAK_IT.md`](BREAK_IT.md) | Lab guide — chunk size, overlap, bad k, wrong model mix, empty index, … |
+- [HOW_I_BUILT_IT.md](HOW_I_BUILT_IT.md) — first-person build story
+- [BREAK_IT.md](BREAK_IT.md) — intentional what-ifs, why it broke, how to fix
 
 ---
 
-## Design notes
+## License / notes
 
-- **CPU-only, free stack** — no paid LLM API required for the default path.
-- **Citations are first-class** — interviewers care that you can ground and verify.
-- **Index is not committed** — always produce it with `ingest.py`.
-- Educational corpus only; not production security advice.
-
----
-
-## License
-
-Code and original `data/` docs are for portfolio / educational use.
-
----
+Educational portfolio project. Original `data/` docs and code are for learning / interview demos, not production security advice. The FAISS index and model caches are not committed; always produce the index with `ingest.py`. CPU-only free stack — no paid LLM API required for the default extractive path.
 
 *Miles Robinson · Cybersecurity + AI Engineering · CPCC → UNC Charlotte · 2026*
